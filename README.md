@@ -1,6 +1,6 @@
 # Enterprise AI Operations Platform (EAOP)
 
-![EAOP Architecture](docs/assets/eaop-architecture.png)
+![EAOP Architecture](docs/assets/EAOP.png)
 
 ## Giới thiệu
 
@@ -42,6 +42,8 @@ Developer → Admin Portal → platform-api → Golden Path Engine
 ---
 
 ## Thành phần hệ thống
+
+![EAOP Architecture](docs/assets/eaop-architecture.png)
 
 ### Lớp giao diện người dùng
 
