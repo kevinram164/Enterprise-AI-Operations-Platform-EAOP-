@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ namespace }}
+  labels:
+    app.kubernetes.io/name: {{ app_name }}
+    phoenix.io/team: {{ team }}
+    phoenix.io/template: {{ template }}
+    phoenix.io/managed-by: phoenix-platform

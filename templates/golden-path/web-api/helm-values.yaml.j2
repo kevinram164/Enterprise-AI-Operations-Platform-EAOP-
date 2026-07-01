@@ -1,0 +1,43 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/{{ team }}/{{ app_name }}
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: {{ app_name }}
+fullnameOverride: {{ app_name }}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+route:
+  enabled: true
+  host: {{ route_host }}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+env:
+  - name: APP_NAME
+    value: {{ app_name }}
+  - name: OTEL_SERVICE_NAME
+    value: {{ otel_service_name }}
+
+postgresql:
+  enabled: true
+  database: {{ postgres_db }}
+  user: {{ postgres_user }}
+
+redis:
+  enabled: true
+  keyPrefix: {{ redis_key_prefix }}
+
+kafka:
+  topic: {{ kafka_topic }}

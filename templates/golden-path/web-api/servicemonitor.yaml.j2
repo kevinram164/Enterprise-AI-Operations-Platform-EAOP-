@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ app_name }}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ app_name }}
+    phoenix.io/team: {{ team }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ app_name }}
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s

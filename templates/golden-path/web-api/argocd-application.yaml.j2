@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ app_name }}
+  namespace: openshift-gitops
+  labels:
+    phoenix.io/team: {{ team }}
+    phoenix.io/app: {{ app_name }}
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_ORG/phoenix-gitops.git
+    targetRevision: main
+    path: applications/{{ team }}/{{ app_name }}
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

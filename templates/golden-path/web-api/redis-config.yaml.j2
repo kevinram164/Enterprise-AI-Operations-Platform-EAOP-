@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ app_name }}-redis
+  namespace: {{ namespace }}
+  labels:
+    app: {{ app_name }}
+    phoenix.io/component: cache
+data:
+  REDIS_HOST: redis.phoenix-platform.svc
+  REDIS_PORT: "6379"
+  REDIS_KEY_PREFIX: {{ redis_key_prefix }}

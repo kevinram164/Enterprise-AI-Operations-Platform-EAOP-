@@ -1,0 +1,16 @@
+{
+  "clientId": "{{ app_name }}-{{ team }}",
+  "name": "{{ display_name }}",
+  "description": "{{ description }}",
+  "rootUrl": "https://{{ route_host }}",
+  "redirectUris": [
+    "https://{{ route_host }}/*"
+  ],
+  "webOrigins": [
+    "https://{{ route_host }}"
+  ],
+  "publicClient": false,
+  "protocol": "openid-connect",
+  "standardFlowEnabled": true,
+  "directAccessGrantsEnabled": false
+}
