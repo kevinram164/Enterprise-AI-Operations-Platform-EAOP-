@@ -1,31 +1,27 @@
 # Phoenix Platform on OpenShift
 
-Namespace: `phoenix-platform`  
-Cluster: `ocp1.npd.co`
+Deploy qua **Jenkins → Harbor → ArgoCD**. Không dùng OpenShift BuildConfig.
 
-## Order of apply
+## Bootstrap
 
 ```bash
+# 1. Namespace + Harbor pull secret
 oc apply -f deploy/openshift/namespaces/
-oc apply -f deploy/openshift/phoenix-platform/infra/
-oc apply -f deploy/openshift/phoenix-platform/builds/
+# xem harbor-pull-secret.md
 
-# From repo root — builds run ON the cluster (no local Docker)
-oc start-build platform-api --from-dir=. --wait -n phoenix-platform
-oc start-build admin-portal --from-dir=. --wait -n phoenix-platform
+# 2. ArgoCD
+oc apply -f gitops/bootstrap/root-app.yaml -n openshift-gitops
 
-oc apply -f deploy/openshift/phoenix-platform/apps/
+# 3. Jenkins build platform-api + admin-portal → Harbor
+# 4. ArgoCD sync apps tự động
 ```
 
-## Before production
+## Infra only (manual nếu cần)
 
-1. Change `postgres-credentials` and `platform-api-secret` passwords
-2. Confirm StorageClass `nfs-csi` exists (`oc get sc nfs-csi`)
-3. Point DNS `portal.ocp1.npd.co` and `api.platform.ocp1.npd.co` to OpenShift router
+```bash
+oc apply -f deploy/openshift/phoenix-platform/infra/
+```
 
-## Routes
+## Storage
 
-| Host | Service |
-|------|---------|
-| `portal.ocp1.npd.co` | admin-portal |
-| `api.platform.ocp1.npd.co` | platform-api |
+PVC dùng `storageClassName: nfs-csi`

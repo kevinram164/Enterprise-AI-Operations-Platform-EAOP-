@@ -33,6 +33,9 @@ def build_context(
         "postgres_user": db_name,
         "redis_key_prefix": f"{team}:{app_name}",
         "otel_service_name": app_name,
+        "harbor_registry": settings.harbor_registry,
+        "harbor_project": settings.harbor_project,
+        "image_repository": f"{settings.harbor_registry}/{settings.harbor_project}/{team}/{app_name}",
     }
 
 

@@ -37,9 +37,11 @@ spec:
       labels:
         app: platform-api
     spec:
+      imagePullSecrets:
+        - name: harbor-pull-secret
       containers:
         - name: platform-api
-          image: image-registry.openshift-image-registry.svc:5000/phoenix-platform/platform-api:latest
+          image: harbor.ocp1.npd.co/phoenix/platform-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8000

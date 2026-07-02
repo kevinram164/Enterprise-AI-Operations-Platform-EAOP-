@@ -1,0 +1,35 @@
+replicaCount: 1
+
+image:
+  repository: harbor.ocp1.npd.co/phoenix/platform-api
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: harbor-pull-secret
+
+service:
+  port: 8000
+
+route:
+  enabled: true
+  host: api.platform.ocp1.npd.co
+
+config:
+  ocpBaseDomain: ocp1.npd.co
+  kafkaTopicPrefix: phoenix
+  corsOrigins: https://portal.ocp1.npd.co
+  templatesDir: /opt/app/templates/golden-path
+
+secret:
+  databaseUrl: postgresql+asyncpg://phoenix:changeme-phoenix-db@postgres.phoenix-platform.svc:5432/phoenix
+  redisUrl: redis://redis.phoenix-platform.svc:6379/0
+  kafkaBootstrapServers: redpanda.phoenix-platform.svc:9092
+
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

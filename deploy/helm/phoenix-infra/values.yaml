@@ -1,0 +1,38 @@
+storageClass: nfs-csi
+
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: phoenix
+  username: phoenix
+  password: changeme-phoenix-db
+  storage: 10Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+redis:
+  enabled: true
+  image: redis:7-alpine
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+redpanda:
+  enabled: true
+  image: redpandadata/redpanda:v24.2.4
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi

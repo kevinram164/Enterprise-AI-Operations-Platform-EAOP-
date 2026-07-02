@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phoenix-infra
+  namespace: openshift-gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_ORG/Enterprise-AI-Operations-Platform-EAOP.git
+    targetRevision: main
+    path: deploy/helm/phoenix-infra
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: phoenix-platform
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

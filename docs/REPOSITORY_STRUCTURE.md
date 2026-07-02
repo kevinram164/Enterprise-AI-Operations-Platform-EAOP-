@@ -35,9 +35,13 @@ enterprise-ai-operations-platform/
 ├── gateways/                          # Gateway configs (not app logic)
 │   └── kong/                          # Kong routes, plugins
 │
-├── deploy/                            # OpenShift manifests + Helm
-│   ├── openshift/                     # Manifests, BuildConfigs
-│   └── helm/
+├── ci/                                # Jenkins Shared Library + Kaniko
+│   ├── jenkins-shared-library/
+│   ├── jenkinsfiles/
+│   ├── docker/                        # Containerfiles
+│   └── vault/                         # Vault path conventions
+│
+├── deploy/                            # OpenShift infra manifests
 │   │   ├── phoenix-platform/          # Umbrella chart
 │   │   ├── keycloak/
 │   │   ├── kong/

@@ -1,5 +1,14 @@
 # Phoenix Platform Umbrella Chart
 
-Deploys platform-api, admin-portal, PostgreSQL, Redis, Kafka on OpenShift.
+Deploy toàn bộ platform stack lên `phoenix-platform` namespace.
 
-**Status:** planned (Phase 2)
+```bash
+cd deploy/helm/phoenix-platform
+helm dependency update
+helm upgrade --install phoenix . \
+  -f values.yaml \
+  -f values-ocp1.npd.co.yaml \
+  -n phoenix-platform --create-namespace
+```
+
+ArgoCD sync chart này — xem `gitops/platform/phoenix-platform.yaml`.

@@ -2,8 +2,6 @@
 
 ![EAOP Architecture](docs/assets/EAOP.png)
 
-## Giới thiệu
-
 **Enterprise AI Operations Platform (EAOP)** — còn gọi là **Phoenix Platform** — là nền tảng vận hành và phát triển ứng dụng nội bộ doanh nghiệp, chạy trên **OpenShift/Kubernetes**. EAOP kết hợp **Internal Developer Platform (IDP)**, **IT Operations**, **GitOps** và **AI** trong một kiến trúc thống nhất.
 
 Thay vì mỗi team tự dựng hạ tầng, tự cấu hình monitoring, tự xin quyền và tự tích hợp AI — developer chỉ cần vào **Admin Portal**, tạo application mới theo **Golden Path**, và platform tự động sinh toàn bộ cấu hình cần thiết rồi deploy qua **ArgoCD**.
@@ -42,8 +40,6 @@ Developer → Admin Portal → platform-api → Golden Path Engine
 ---
 
 ## Thành phần hệ thống
-
-![EAOP Architecture](docs/assets/eaop-architecture.png)
 
 ### Lớp giao diện người dùng
 
@@ -114,16 +110,17 @@ Tích hợp thông báo qua **Email**, **Microsoft Teams**, **Slack**.
 | **ArgoCD** | GitOps continuous delivery |
 | **Helm** | Package management |
 | **Vault** | Secrets management |
-| **GitLab CI / GHCR** | CI/CD, container registry |
+| **Jenkins + Kaniko** | CI/CD build (Shared Library) |
+| **Harbor** | Container registry |
 
 ### Lớp Observability
 
 | Thành phần | Vai trò |
 |------------|---------|
 | **OpenTelemetry** | Traces, metrics, logs |
-| **Prometheus + Grafana** | Metrics & dashboards |
+| **Coroot** | Observability — logs, traces, metrics correlation |
 | **Instana** | APM, service mapping |
-| **EFK / OpenSearch** | Log aggregation & search |
+| **Prometheus + Grafana** | Metrics & dashboards |
 
 ### Hạ tầng triển khai
 
@@ -151,12 +148,18 @@ Tích hợp thông báo qua **Email**, **Microsoft Teams**, **Slack**.
 
 ## Trạng thái triển khai
 
+> **Chiến lược:** CI/GitOps trước — Jenkins + Kaniko + Harbor + Vault + ArgoCD làm nền, các layer khác build trên đó.
+
 | Phase | Phạm vi | Trạng thái |
 |-------|---------|------------|
-| **1** | Golden Path, platform-api, Admin Portal | ✅ Done |
-| **2** | GitOps push, ArgoCD sync app lên OpenShift | 🟡 In progress |
-| **3** | AI Gateway, MCP Server, Chat UI | Planned |
-| **4+** | CMDB, Ticket, Workflow, Cost, ... | Planned |
+| **A** | CI: Jenkins Shared Library + Kaniko + Harbor + Vault | 🟡 **Current** |
+| **B** | GitOps: ArgoCD bootstrap, platform deploy | In progress |
+| **C** | Golden Path → GitOps commit → ArgoCD sync | Planned |
+| **D** | platform-api, Admin Portal (app logic) | ✅ Done |
+| **E** | AI Gateway, MCP, Chat UI | Planned |
+| **F+** | CMDB, Ticket, Workflow, Cost, ... | Planned |
+
+Chi tiết CI/CD: [docs/ci-cd.md](docs/ci-cd.md)
 
 ---
 
@@ -165,14 +168,11 @@ Tích hợp thông báo qua **Email**, **Microsoft Teams**, **Slack**.
 ```
 apps/                    # Admin Portal, Dashboard, Chat UI
 services/platform-api/   # Control plane + Golden Path
-services/core/           # IAM, Audit, Notification
-services/operations/     # CMDB, Ticket, Workflow, Asset, Cost
-services/infrastructure/ # K8s Manager, Cloud Manager
-services/ai/             # AI Gateway, Agent, MCP, Knowledge
-deploy/openshift/        # Manifests OpenShift
-gitops/                  # ArgoCD manifests
+ci/                      # Jenkins Shared Library, Kaniko, Containerfiles
+deploy/helm/                 # Helm charts (ArgoCD deploy)
+gitops/                      # ArgoCD Applications → trỏ deploy/helm/
 templates/golden-path/   # Provisioning templates
-docs/                    # Architecture + service specs
+docs/                    # Architecture + CI/CD + service specs
 ```
 
 Chi tiết: [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md) · [docs/services/](docs/services/)
@@ -181,19 +181,19 @@ Chi tiết: [docs/REPOSITORY_STRUCTURE.md](docs/REPOSITORY_STRUCTURE.md) · [doc
 
 ## Triển khai trên OpenShift
 
-Xem [deploy/README.md](deploy/README.md).
+Xem [deploy/README.md](deploy/README.md) · [ci/README.md](ci/README.md)
 
 ```bash
-oc login --token=... --server=https://api.ocp1.npd.co:6443
+oc login --server=https://api.ocp1.npd.co:6443
 
+# 1. Namespace + Harbor pull secret
 oc apply -f deploy/openshift/namespaces/
-oc apply -f deploy/openshift/phoenix-platform/infra/
-oc apply -f deploy/openshift/phoenix-platform/builds/
 
-oc start-build platform-api --from-dir=. --wait -n phoenix-platform
-oc start-build admin-portal --from-dir=. --wait -n phoenix-platform
+# 2. ArgoCD bootstrap (sửa repoURL trước)
+oc apply -f gitops/bootstrap/root-app.yaml -n openshift-gitops
 
-oc apply -f deploy/openshift/phoenix-platform/apps/
+# 3. Jenkins: build platform-api + admin-portal → Harbor (Kaniko)
+# 4. ArgoCD auto-sync từ gitops/platform/
 ```
 
 ### Routes

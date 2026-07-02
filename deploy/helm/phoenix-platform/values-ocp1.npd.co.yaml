@@ -1,0 +1,24 @@
+# Cluster-specific overrides for ocp1.npd.co
+
+phoenix-infra:
+  storageClass: nfs-csi
+  postgres:
+    password: changeme-phoenix-db   # override via ArgoCD / Vault
+
+platform-api:
+  image:
+    repository: harbor.ocp1.npd.co/phoenix/platform-api
+    tag: latest
+  route:
+    host: api.platform.ocp1.npd.co
+  secret:
+    databaseUrl: postgresql+asyncpg://phoenix:changeme-phoenix-db@postgres.phoenix-platform.svc:5432/phoenix
+
+admin-portal:
+  image:
+    repository: harbor.ocp1.npd.co/phoenix/admin-portal
+    tag: latest
+  route:
+    host: portal.ocp1.npd.co
+  env:
+    nextPublicApiUrl: https://api.platform.ocp1.npd.co

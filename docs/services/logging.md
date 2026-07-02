@@ -5,4 +5,4 @@
 
 ## Role
 
-Centralized log storage, search, and export (EFK / OpenSearch).
+Centralized observability via **Coroot** — logs, traces, metrics correlation.

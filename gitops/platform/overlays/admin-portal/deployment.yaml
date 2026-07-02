@@ -15,9 +15,11 @@ spec:
       labels:
         app: admin-portal
     spec:
+      imagePullSecrets:
+        - name: harbor-pull-secret
       containers:
         - name: admin-portal
-          image: image-registry.openshift-image-registry.svc:5000/phoenix-platform/admin-portal:latest
+          image: harbor.ocp1.npd.co/phoenix/admin-portal:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000

@@ -1,0 +1,27 @@
+replicaCount: 1
+
+image:
+  repository: harbor.ocp1.npd.co/phoenix/admin-portal
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: harbor-pull-secret
+
+service:
+  port: 3000
+
+route:
+  enabled: true
+  host: portal.ocp1.npd.co
+
+env:
+  nextPublicApiUrl: https://api.platform.ocp1.npd.co
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 300m
+    memory: 256Mi

@@ -1,6 +1,6 @@
 # Logging Service
 
-Log ingestion query API. Integrates with EFK/OpenSearch stack.
+Log ingestion query API. Integrates with **Coroot** observability platform.
 
 **Status:** planned  
 **Stack:** Python FastAPI

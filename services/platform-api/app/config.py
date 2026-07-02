@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["https://portal.ocp1.npd.co"]
 
     ocp_base_domain: str = "ocp1.npd.co"
+    harbor_registry: str = "harbor.ocp1.npd.co"
+    harbor_project: str = "phoenix"
     templates_dir: str = ""
 
     @property

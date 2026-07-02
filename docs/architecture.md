@@ -133,10 +133,13 @@ Base path: `/api/v1`
 
 | Phase | Deliverables | Status |
 |-------|-------------|--------|
-| 0 | Monorepo, platform-api, OpenShift manifests, docs | Done |
-| 1 | Golden Path engine, provision API, admin portal | **Current** |
-| 2 | GitOps repo, ArgoCD sync, Helm on OpenShift | Planned |
-| 3 | AI Gateway, MCP skeleton, OpenTelemetry | Planned |
+| A | Jenkins + Shared Library + Kaniko + Harbor + Vault | **Current** |
+| B | ArgoCD bootstrap, platform GitOps deploy | In progress |
+| C | Golden Path → GitOps commit | Planned |
+| D | platform-api, Admin Portal app logic | Done |
+| E | AI Gateway, MCP, Chat UI | Planned |
+
+CI/CD detail: [ci-cd.md](ci-cd.md)
 
 ## Security (MVP → Production)
 

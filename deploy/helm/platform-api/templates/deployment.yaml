@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-api-config
+  labels:
+    app: platform-api
+    {{- include "platform-api.labels" . | nindent 4 }}
+data:
+  OCP_BASE_DOMAIN: {{ .Values.config.ocpBaseDomain | quote }}
+  KAFKA_TOPIC_PREFIX: {{ .Values.config.kafkaTopicPrefix | quote }}
+  PLATFORM_API_CORS_ORIGINS: {{ .Values.config.corsOrigins | quote }}
+  TEMPLATES_DIR: {{ .Values.config.templatesDir | quote }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: platform-api-secret
+  labels:
+    app: platform-api
+    {{- include "platform-api.labels" . | nindent 4 }}
+type: Opaque
+stringData:
+  DATABASE_URL: {{ .Values.secret.databaseUrl | quote }}
+  REDIS_URL: {{ .Values.secret.redisUrl | quote }}
+  KAFKA_BOOTSTRAP_SERVERS: {{ .Values.secret.kafkaBootstrapServers | quote }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: platform-api
+  labels:
+    app: platform-api
+    {{- include "platform-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: platform-api
+  template:
+    metadata:
+      labels:
+        app: platform-api
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: platform-api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          envFrom:
+            - configMapRef:
+                name: platform-api-config
+            - secretRef:
+                name: platform-api-secret
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 30
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: platform-api
+  labels:
+    app: platform-api
+    {{- include "platform-api.labels" . | nindent 4 }}
+spec:
+  selector:
+    app: platform-api
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+{{- if .Values.route.enabled }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: platform-api
+  labels:
+    app: platform-api
+    {{- include "platform-api.labels" . | nindent 4 }}
+spec:
+  host: {{ .Values.route.host }}
+  to:
+    kind: Service
+    name: platform-api
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}
