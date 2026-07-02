@@ -41,6 +41,8 @@ Developer → Admin Portal → platform-api → Golden Path Engine
 
 ## Thành phần hệ thống
 
+![EAOP Architecture](docs/assets/eaop-architecture.png)
+
 ### Lớp giao diện người dùng
 
 | Thành phần | Mô tả | Trạng thái |
